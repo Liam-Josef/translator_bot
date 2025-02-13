@@ -33,10 +33,11 @@ async def on_ready():
     print(f"✅ Logged in as {bot.user}")
     print("🔍 Bot is online and ready to detect reactions!")
 
-# ✅ Function to run translator in a thread (fix for Python 3.8)
+# ✅ Function to run translator in a thread (Fix for Python 3.8)
 async def translate_text(text, dest_lang):
     loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(None, lambda: translator.translate(text, dest=dest_lang).text)
+    translated = await loop.run_in_executor(None, lambda: translator.translate(text, dest=dest_lang))
+    return translated.text  # ✅ Extract text from the translated object
 
 # ✅ Handle reactions to translate messages (Fully fixed for Python 3.8)
 @bot.event

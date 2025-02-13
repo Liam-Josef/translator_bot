@@ -36,8 +36,8 @@ async def on_ready():
 # ✅ Function to run translator in a thread (Fix for Python 3.8)
 async def translate_text(text, dest_lang):
     loop = asyncio.get_running_loop()
-    translated = await loop.run_in_executor(None, lambda: translator.translate(text, dest=dest_lang))
-    return translated.text  # ✅ Extract text from the translated object
+    translated = await loop.run_in_executor(None, translator.translate, text, dest_lang)
+    return translated.text  # ✅ Properly extract the translated text
 
 # ✅ Handle reactions to translate messages (Fully fixed for Python 3.8)
 @bot.event

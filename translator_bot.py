@@ -33,7 +33,7 @@ async def on_ready():
     print(f"✅ Logged in as {bot.user}")
     print("🔍 Bot is online and ready to detect reactions!")
 
-# ✅ Handle reactions to translate messages
+# ✅ Handle reactions to translate messages (Fixed for Python 3.8)
 @bot.event
 async def on_reaction_add(reaction, user):
     if user.bot:  # Ignore bot reactions
@@ -55,7 +55,7 @@ async def on_reaction_add(reaction, user):
 
         loop = asyncio.get_running_loop()
         try:
-            translated = await loop.run_in_executor(None, translator.translate, message.content, lang)
+            translated = await loop.run_in_executor(None, lambda: translator.translate(message.content, dest=lang))
             print(f"✅ Translation success: {translated.text}")
 
             await message.channel.send(f"{user.mention} 🌍 **Translation ({lang.upper()}):** {translated.text}")

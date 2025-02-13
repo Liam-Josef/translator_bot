@@ -33,7 +33,12 @@ async def on_ready():
     print(f"✅ Logged in as {bot.user}")
     print("🔍 Bot is online and ready to detect reactions!")
 
-# ✅ Handle reactions to translate messages (Fixed for Python 3.8)
+# ✅ Function to run translator in a thread (fix for Python 3.8)
+async def translate_text(text, dest_lang):
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, lambda: translator.translate(text, dest=dest_lang).text)
+
+# ✅ Handle reactions to translate messages (Fully fixed for Python 3.8)
 @bot.event
 async def on_reaction_add(reaction, user):
     if user.bot:  # Ignore bot reactions
@@ -53,12 +58,11 @@ async def on_reaction_add(reaction, user):
         lang = user_preferences.get(str(user.id), "en")
         print(f"🔍 Attempting translation to {lang} for message: {message.content}")
 
-        loop = asyncio.get_running_loop()
         try:
-            translated = await loop.run_in_executor(None, lambda: translator.translate(message.content, dest=lang))
-            print(f"✅ Translation success: {translated.text}")
+            translated_text = await translate_text(message.content, lang)  # ✅ Now properly awaited
+            print(f"✅ Translation success: {translated_text}")
 
-            await message.channel.send(f"{user.mention} 🌍 **Translation ({lang.upper()}):** {translated.text}")
+            await message.channel.send(f"{user.mention} 🌍 **Translation ({lang.upper()}):** {translated_text}")
 
         except Exception as e:
             print(f"❌ Translation failed: {e}")

@@ -41,17 +41,24 @@ async def on_reaction_add(reaction, user):
 
     print(f"✅ Reaction detected: {reaction.emoji} by {user.name} on message: {reaction.message.content}")
 
-    if str(reaction.emoji) == "🌍":  # Earth emoji triggers translation
+    if str(reaction.emoji) == "🌍" or str(reaction.emoji) == "🌎":  # Accepts different Earth emojis
         message = reaction.message
+
+        # ✅ Ignore bot messages and commands
+        if message.author.bot or message.content.startswith("!"):
+            print("⚠️ Skipping translation: Message is a bot response or a command.")
+            return
 
         # Get user's preferred language (default: English)
         lang = user_preferences.get(str(user.id), "en")
+        print(f"🔍 Attempting translation to {lang} for message: {message.content}")
 
         try:
-            print(f"🔍 Attempting translation to {lang}: {message.content}")
-            translated_text = translator.translate(message.content, dest=lang).text
-            await message.channel.send(f"{user.mention} 🌍 **Translation ({lang.upper()}):** {translated_text}")
-            print(f"✅ Translated message: {translated_text}")
+            translated = translator.translate(message.content, dest=lang)
+            print(f"✅ Translation success: {translated.text}")
+
+            await message.channel.send(f"{user.mention} 🌍 **Translation ({lang.upper()}):** {translated.text}")
+
         except Exception as e:
             print(f"❌ Translation failed: {e}")
             await message.channel.send(f"❌ Translation failed: {e}")

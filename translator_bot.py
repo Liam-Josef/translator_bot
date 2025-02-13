@@ -41,7 +41,7 @@ async def on_reaction_add(reaction, user):
 
     print(f"✅ Reaction detected: {reaction.emoji} by {user.name} on message: {reaction.message.content}")
 
-    if str(reaction.emoji) == "🌍" or str(reaction.emoji) == "🌎":  # Accepts different Earth emojis
+    if str(reaction.emoji) in ["🌍", "🌎"]:  # Accepts different Earth emojis
         message = reaction.message
 
         # ✅ Ignore bot messages and commands
@@ -54,7 +54,7 @@ async def on_reaction_add(reaction, user):
         print(f"🔍 Attempting translation to {lang} for message: {message.content}")
 
         try:
-            translated = translator.translate(message.content, dest=lang)
+            translated = await asyncio.to_thread(translator.translate, message.content, dest=lang)  # ✅ Fix: Run in thread
             print(f"✅ Translation success: {translated.text}")
 
             await message.channel.send(f"{user.mention} 🌍 **Translation ({lang.upper()}):** {translated.text}")
@@ -76,7 +76,7 @@ def run_bot():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
-        loop.run_until_complete(bot.start("MTMzOTQ1NzIzNTkzNTU1OTczMQ.Goa4_D.zn_3JTw-VwBAqhoHIRlt1IfLOgzfHOQ253m-5M"))
+        loop.run_until_complete(bot.start("YOUR_BOT_TOKEN"))
     except KeyboardInterrupt:
         print("❌ Bot stopped gracefully.")
     finally:

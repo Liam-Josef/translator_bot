@@ -53,8 +53,9 @@ async def on_reaction_add(reaction, user):
         lang = user_preferences.get(str(user.id), "en")
         print(f"🔍 Attempting translation to {lang} for message: {message.content}")
 
+        loop = asyncio.get_running_loop()
         try:
-            translated = await asyncio.to_thread(translator.translate, message.content, dest=lang)  # ✅ Fix: Run in thread
+            translated = await loop.run_in_executor(None, translator.translate, message.content, lang)
             print(f"✅ Translation success: {translated.text}")
 
             await message.channel.send(f"{user.mention} 🌍 **Translation ({lang.upper()}):** {translated.text}")
